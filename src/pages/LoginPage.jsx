@@ -39,10 +39,11 @@ const LoginPage = () => {
           setPassword('');
         }
       } else {
-        // On Login, validate if the email is allowed first
-        const { data: validationData, error: validationError } = await supabase.functions.invoke('validate-user-on-login', {
-          body: JSON.stringify({ email }),
-        });
+        // *** 🔥 هذا هو التعديل الوحيد ***
+        const { data: validationData, error: validationError } =
+          await supabase.functions.invoke('validate-user-on-login', {
+            body: { email }, // ← بدون JSON.stringify
+          });
 
         if (validationError) throw validationError;
         if (validationData.error) throw new Error(validationData.error);
@@ -51,7 +52,8 @@ const LoginPage = () => {
             throw new Error("هذا الحساب غير مصرح له بالدخول.");
         }
 
-        const { error: signInError, data: signInData } = await supabase.auth.signInWithPassword({ email, password });
+        const { error: signInError, data: signInData } =
+          await supabase.auth.signInWithPassword({ email, password });
         if (signInError) throw signInError;
         
         if (signInData.user && signInData.session) {
